@@ -36,3 +36,5 @@ next-env.d.ts
 
 # infisical
 .infisical.json
+# Local test recipient payload
+/test-message.json
