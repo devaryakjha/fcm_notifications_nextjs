@@ -55,9 +55,11 @@ its old token for the instance after receiving the registered FID.
 
 The foreground `onMessage()` listener adds payloads to the table. In the
 background, the SDK displays **notification payloads** automatically and handles
-`webpush.fcm_options.link` clicks. No extra `showNotification()` call means no
-double display. Data-only messages appear in the foreground but intentionally
-have no custom background UI. Use notification + data for the test below.
+`webpush.fcm_options.link` clicks. The worker avoids an extra
+`showNotification()` call that would duplicate the SDK notification. Data-only messages appear in the foreground but intentionally
+have no custom background UI. Chrome may show a generic "This site has been
+updated in the background" alert if a background push finishes without displaying
+a notification. Use notification + data for the test below.
 
 Keep `.env.local` present for both build and server execution. Next.js embeds
 public variables at build time: rebuild and restart after changing projects or
@@ -67,9 +69,9 @@ is not supported.
 ## Send one test notification
 
 Send only to your own registered test browser. Use the FID shown on the page as
-`message.fid`. A FID is not a legacy FCM registration token. The console's **Send test message** dialog accepts installation IDs and legacy
-tokens (checked on 2026-09-09). The HTTP v1 request below uses the explicit
-current target field.
+`message.fid`. A FID is not a legacy FCM registration token. The console's
+**Send test message** dialog accepts installation IDs and legacy tokens (checked
+on 2026-09-09). The HTTP v1 request below uses the explicit current target field.
 
 For a quick test without sender credentials on your machine, open **DevOps and
 engagement → Messaging → Create your first campaign → Firebase Notification
@@ -130,6 +132,8 @@ A returned message name confirms **FCM accepted the request**, not delivery.
 3. **Click:** with the HTTPS page open, click the notification and confirm that
    tab gains focus. Then close the page, send another notification, and verify
    clicking opens the expected URL. Keep the browser running for these tests.
+   The table is not durable storage: a newly opened page may miss the click
+   payload while it initializes, even when navigation succeeds.
 4. **Recovery:** reload the app and confirm registration returns. Deny permission
    in site settings, reload, and verify the blocked guidance without a crash.
 

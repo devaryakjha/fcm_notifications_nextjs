@@ -1,8 +1,9 @@
 # Validation — 2026-09-09
 
 This record separates actual FCM delivery from static and browser-only checks.
-The update is **not yet fully verified**: visible macOS alerts and real
-notification clicks still require the OS settings described below.
+Real foreground delivery, visible background alerts, HTTP v1 sending, and
+user-assisted notification clicks were exercised. The caveats below limit these
+results to this browser/test session.
 
 ## Environment
 
@@ -42,33 +43,44 @@ notification clicks still require the OS settings described below.
   This was a real FCM message, not a locally dispatched push event.
 - The console's test-device dialog explicitly accepts Firebase installation IDs.
 
-## Pending / limits
+## HTTP v1 and native notification checks
 
-- **Visible OS notification and real click tests:** macOS lists Google Chrome
-  notifications as **Off**, and notifications while mirroring/sharing as
-  **Notifications Off**. The browser stored the background notification, but
-  that does not prove an OS alert was visible. Approval was requested before
-  temporarily changing those settings. Open-tab focus and closed-tab navigation
-  have not been claimed as passed.
-- Explicit HTTP v1 `message.fid` + `webpush.fcm_options.link` sending has been
-  checked against the current official reference, but not executed. Actual test
-  sends above used the Firebase console. Cloud Shell credential authorization
-  was not granted by the agent without user confirmation.
+- An authorized Google Cloud Shell session used the test-project account and
+  HTTP v1 `message.fid` with an explicit same-origin HTTPS
+  `webpush.fcm_options.link`. FCM returned message names for the requests.
+  Access tokens stayed inside the shell and were not printed or saved.
+- With Chrome's OS alerts temporarily enabled, Notification Centre showed the
+  named `FCM HTTP background-open-2` alert with its expected title and body.
+- Open-page click: the user confirmed clicking `FCM HTTP click-open`; the browser
+  then showed the existing app tab focused and exactly one matching table row.
+- Closed-page click: the app tab was closed, leaving `about:blank`. After a fresh
+  send and the user's click on the regular FCM alert, the browser showed a new
+  focused tab at the exact requested HTTPS origin. The user confirmed the
+  regular notification opened the site. The newly opened page showed zero rows,
+  so cold-start click-payload delivery to the table is **not** claimed.
+- Native automation could inspect alerts but did not reliably activate them;
+  actual clicks above were performed by the user, with browser state inspected
+  afterward. An early attempt stayed on `about:blank` and was not counted.
+- Both Chrome OS notification entries were restored to Off. The second entry's
+  temporary alert style was restored, and notifications during screen sharing
+  were restored to Notifications Off.
+
+## Limits and observed caveat
+
+- A separate generic Chrome alert, "This site has been updated in the
+  background", appeared during the repeated sends/worker inspection. The user
+  confirmed it did not open the site, while the regular notification did.
+  Its exact triggering push was not isolated. This session therefore does not
+  prove that extra generic browser alerts can never occur. It did not show two
+  copies of a named FCM notification, and the app has no custom
+  `showNotification()` call.
+- Chrome emits that generic fallback when a push finishes without displaying a
+  notification; see [Chrome's push-event documentation](https://web.dev/articles/push-notifications-handling-messages).
+  Data-only background messages intentionally have no custom display handler in
+  this example. Use notification payloads for the documented visible-alert test.
 - Unsupported-browser guidance is present; no separate unsupported physical
   browser/device was tested. The in-app browser denied notifications and was
   used for missing-config/blocked-state UI checks only.
 - No iOS/Safari, browser-quit delivery, PWA installation, or offline delivery test.
-- Early test sends performed during browser focus/reload setup were not counted
-  as foreground passes; the later table observations above are the evidence.
-
-## Complete before declaring full verification
-
-1. With approval, temporarily enable Chrome's macOS notifications and allow
-   alerts during screen sharing (or test outside screen sharing).
-2. Send one fresh notification while the app tab is hidden; observe one OS alert.
-3. Click it with the app tab open and confirm focus; repeat with the page closed
-   and confirm the intended HTTPS URL opens. For explicit link behavior, send
-   the README HTTP v1 request from an authorized sender.
-4. Restore any changed OS settings and stop the temporary tunnel/server.
-5. Record these results, verify remote checks, and only then remove the
-   task-owned temporary clone.
+- Early sends during browser focus/reload setup were not counted as foreground
+  passes. These results do not establish delivery guarantees or timing bounds.
