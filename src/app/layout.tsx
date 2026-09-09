@@ -1,24 +1,11 @@
 import "./globals.css";
-import "react-toastify/dist/ReactToastify.css";
 import type { Metadata } from "next";
-import { ToastContainer } from "react-toastify";
 
 export const metadata: Metadata = {
-  title: "Next Js FCM example",
-  description: "A Next Js FCM example",
+  title: "FCM + Next.js example",
+  description: "Register a browser and receive Firebase Cloud Messaging notifications.",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <html lang="en">
-      <body>
-        <ToastContainer />
-        {children}
-      </body>
-    </html>
-  );
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return <html lang="en"><body>{children}</body></html>;
 }

@@ -1,37 +1,17 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
-}
-
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
-  padding: 1rem;
-}
-
-table,
-th,
-td {
-  border: 1px solid white;
-  border-collapse: collapse;
-  padding: 0.5rem;
-}
-
-th {
-  background-color: red;
-}
+:root { color-scheme: light dark; font-family: system-ui, sans-serif; }
+body { margin: 0; padding: 2rem 1rem; line-height: 1.5; }
+main { max-width: 64rem; margin: auto; }
+h1 { font-size: clamp(1.5rem, 4vw, 2rem); line-height: 1.2; }
+h2 { margin-top: 2.5rem; }
+button, input { font: inherit; padding: .65rem .9rem; }
+button { cursor: pointer; }
+button:disabled { cursor: default; }
+:focus-visible { outline: 3px solid #477fe8; outline-offset: 3px; }
+section { margin-top: 1.5rem; }
+label { display: block; margin-bottom: .5rem; font-weight: 600; }
+input { box-sizing: border-box; width: 100%; max-width: 32rem; }
+.table-scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; text-align: left; }
+caption { text-align: left; padding-bottom: .75rem; }
+th, td { border: 1px solid GrayText; padding: .75rem; vertical-align: top; overflow-wrap: anywhere; }
+pre { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
